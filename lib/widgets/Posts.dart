@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:my_image/widgets/FavoriteAndComments.dart';
 import 'package:my_image/src/ItemCollection.dart';
 import 'package:my_image/widgets/photo-widgets.dart';
 
@@ -8,12 +9,19 @@ import '../screens/PostDetails.dart';
 
 ///A widget that shows all of the posted items
 
-class Posts extends StatelessWidget {
+class Posts extends StatefulWidget {
   const Posts({Key? key}) : super(key: key);
 
   @override
+  _PostsState createState() => _PostsState();
+}
+
+class _PostsState extends State<Posts> {
+
+
+  @override
   Widget build(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser;
+    final currUser = FirebaseAuth.instance.currentUser;
 
     return StreamBuilder(
       stream: FirebaseFirestore.instance
@@ -44,44 +52,49 @@ class Posts extends StatelessWidget {
               List<dynamic> _imageUrl = postCollection[index]['userImage'];
               String _timeStamp = postCollection[index]['createdAt'].toString();
               String _username = postCollection[index]['username'];
+              int _numOfFavorite = postCollection[index]['numOfFavorite'];
 
-              ItemCollection _detail = ItemCollection(_title,
-                  _username, _description, _imageUrl, _timeStamp);
+              String _imageID = postCollection[index].id.toString();
+
+              ItemCollection _detail = ItemCollection(
+                  _title, _username, _description, _imageUrl, _timeStamp);
               return Padding(
                 padding: const EdgeInsets.all(8),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    Row(
-                      children: <Widget>[
-                        const Padding(padding: EdgeInsets.all(10)),
-                        OverviewImage(imageUrl: _imageUrl),
-                        const Padding(padding: EdgeInsets.all(10)),
-                        Column(
+                    Card(
+                      child: SizedBox(
+                        height: 128 * 3,
+                        child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
+                            const Padding(padding: EdgeInsets.all(10)),
+                            OverviewImage(imageUrl: _imageUrl),
+                            FavoriteAndComments(imageId: _imageID),
                             Text(
-                              _title,
+                              _username + ": " + _title,
                               maxLines: 3,
+                              textAlign: TextAlign.left,
                               style: const TextStyle(
                                 fontSize: 18,
                               ),
                             ),
+                            // Expanded(
+                            //   child: IconButton(
+                            //     alignment: Alignment.centerRight,
+                            //     icon: const Icon(Icons.arrow_forward_ios),
+                            //     onPressed: () {
+                            //       Navigator.push(context,
+                            //           MaterialPageRoute(builder: (context) {
+                            //         return PostDetails(detail: _detail);
+                            //       }));
+                            //     },
+                            //   ),
+                            // ),
                           ],
                         ),
-                        Expanded(
-                          child: IconButton(
-                            alignment: Alignment.centerRight,
-                            icon: const Icon(Icons.arrow_forward_ios),
-                            onPressed: () {
-                              Navigator.push(context,
-                                  MaterialPageRoute(builder: (context) {
-                                return PostDetails(detail: _detail);
-                              }));
-                            },
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                     const Divider(
                       height: 8,

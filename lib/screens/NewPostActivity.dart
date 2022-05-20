@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 
+import '../src/CommentCollection.dart';
 import '../widgets/NewPostForm.dart';
 
 
@@ -32,6 +33,7 @@ class _NewPostActivityState extends State<NewPostActivity> {
         .get();
 
     List<String> imageUrls = <String>[];
+    List<CommentCollection> comments = <CommentCollection>[];
 
     try {
       setState(() {
@@ -45,7 +47,7 @@ class _NewPostActivityState extends State<NewPostActivity> {
         final ref = FirebaseStorage.instance
             .ref()
             .child('Images')
-            .child(user!.uid + time + '_' + index + '.jpg');
+            .child(user.uid + time + '_' + index + '.jpg');
 
         await ref.putFile(_image);
 
@@ -58,9 +60,11 @@ class _NewPostActivityState extends State<NewPostActivity> {
         'title': itemTitle,
         'description': itemDescription,
         'createdAt': Timestamp.now(),
-        'userId': user!.uid,
+        'userId': user.uid,
         'username': userData.data()!['username'],
         'userImage': imageUrls,
+        'numOfFavorite': 0,
+        'comments': comments,
       });
       _controller.clear();
 

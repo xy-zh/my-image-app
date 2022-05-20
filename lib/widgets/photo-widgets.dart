@@ -105,8 +105,9 @@ class _OverviewImageState extends State<OverviewImage> {
     if (widget.imageUrl.isEmpty) {
       return Image.asset(//show image placeholder if there is no image posted
         'images/no-image.PNG',
-        fit: BoxFit.fitWidth,
-        width: 128,
+        fit: BoxFit.fitHeight,
+        height: 128*2,
+
       );
     } else {
       return Image.network( // show one of the image from database
