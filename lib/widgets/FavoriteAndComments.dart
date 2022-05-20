@@ -42,7 +42,7 @@ class _FavoriteAndCommentsState extends State<FavoriteAndComments> {
   }
 
   getComment() {
-
+    //TODO: add comment page
   }
 
   void addFavorite(String imageID) {
