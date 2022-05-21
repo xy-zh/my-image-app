@@ -6,6 +6,7 @@ import 'package:my_image/src/ItemCollection.dart';
 import 'package:my_image/widgets/photo-widgets.dart';
 
 import '../screens/PostDetails.dart';
+import 'Texts.dart';
 
 ///A widget that shows all of the posted items
 
@@ -17,8 +18,6 @@ class Posts extends StatefulWidget {
 }
 
 class _PostsState extends State<Posts> {
-
-
   @override
   Widget build(BuildContext context) {
     final currUser = FirebaseAuth.instance.currentUser;
@@ -38,75 +37,96 @@ class _PostsState extends State<Posts> {
           );
         }
         if (postsSnapshot.data == null) {
-          return Text("no posts");
+          return const Text("no posts");
         }
         final postCollection = postsSnapshot.data!.docs;
-        return ListView.builder(
-            shrinkWrap: true,
-            itemCount: postCollection.length,
-            scrollDirection: Axis.vertical,
-            physics: const NeverScrollableScrollPhysics(),
-            itemBuilder: (context, index) {
-              String _title = postCollection[index]['title'];
-              String _description = postCollection[index]['description'];
-              List<dynamic> _imageUrl = postCollection[index]['userImage'];
-              String _timeStamp = postCollection[index]['createdAt'].toString();
-              String _username = postCollection[index]['username'];
-              int _numOfFavorite = postCollection[index]['numOfFavorite'];
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            children: <Widget>[
+              Expanded(
+                child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: postCollection.length,
+                    padding: EdgeInsets.zero,
+                    scrollDirection: Axis.vertical,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemBuilder: (context, index) {
+                      String _title = postCollection[index]['title'];
+                      String _description =
+                          postCollection[index]['description'];
+                      List<dynamic> _imageUrl =
+                          postCollection[index]['userImage'];
+                      String _timeStamp =
+                          postCollection[index]['createdAt'].toString();
+                      String _username = postCollection[index]['username'];
 
-              String _imageID = postCollection[index].id.toString();
+                      String _imageID = postCollection[index].id.toString();
 
-              ItemCollection _detail = ItemCollection(
-                  _title, _username, _description, _imageUrl, _timeStamp);
-              return Padding(
-                padding: const EdgeInsets.all(8),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Card(
-                      child: SizedBox(
-                        height: 128 * 3,
+                      ItemCollection _detail = ItemCollection(_title, _username,
+                          _description, _imageUrl, _timeStamp);
+                      return Card(
+                        clipBehavior: Clip.antiAliasWithSaveLayer,
+                        color: const Color(0xFFF5F5F5),
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          mainAxisSize: MainAxisSize.max,
                           children: <Widget>[
-                            const Padding(padding: EdgeInsets.all(10)),
-                            OverviewImage(imageUrl: _imageUrl),
-                            FavoriteAndComments(imageId: _imageID),
-                            Text(
-                              _username + ": " + _title,
-                              maxLines: 3,
-                              textAlign: TextAlign.left,
-                              style: const TextStyle(
-                                fontSize: 18,
+                            Container(
+                              height: 320,
+                              child: Container(
+                                width: double.infinity,
+                                height: 640,
+                                child: ImageSlider(images: _imageUrl),
                               ),
                             ),
-                            // Expanded(
-                            //   child: IconButton(
-                            //     alignment: Alignment.centerRight,
-                            //     icon: const Icon(Icons.arrow_forward_ios),
-                            //     onPressed: () {
-                            //       Navigator.push(context,
-                            //           MaterialPageRoute(builder: (context) {
-                            //         return PostDetails(detail: _detail);
-                            //       }));
-                            //     },
-                            //   ),
-                            // ),
+                            Container(
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                boxShadow: const [
+                                  BoxShadow(
+                                    blurRadius: 5,
+                                    color: Color(0x3416202A),
+                                    offset: Offset(0, 3),
+                                  )
+                                ],
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsetsDirectional.fromSTEB(
+                                    4, 4, 4, 4),
+                                child: Column(
+                                    mainAxisSize: MainAxisSize.max,
+                                    children: <Widget>[
+                                      TextContents(
+                                        username: _username,
+                                        title: _title,
+                                      ),
+                                      const Divider(
+                                        height: 8,
+                                        thickness: 1,
+                                        indent: 4,
+                                        endIndent: 4,
+                                        color: Color(0xFFDBE2E7),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsetsDirectional
+                                            .fromSTEB(4, 0, 4, 4),
+                                        child: FavoriteAndComments(
+                                            imageId: _imageID),
+                                      ),
+                                    ]),
+                              ),
+                            ),
                           ],
                         ),
-                      ),
-                    ),
-                    const Divider(
-                      height: 8,
-                      thickness: 1,
-                      indent: 8,
-                      endIndent: 8,
-                      color: Colors.grey,
-                    ),
-                  ],
-                ),
-              );
-            });
+                      );
+                    }),
+              ),
+            ],
+          ),
+        );
       },
     );
   }

@@ -12,33 +12,45 @@ class FavoriteAndComments extends StatefulWidget {
 }
 
 class _FavoriteAndCommentsState extends State<FavoriteAndComments> {
-
   final user = FirebaseAuth.instance.currentUser;
   int _numOfFavorite = 0;
 
-  List<dynamic> favoriteList = [];
+  late List<dynamic> favoriteList;
   List<dynamic> comments = [];
   bool isLiked = false;
+  bool _disposed = false;
 
-  _getFavoriteList() async {
-    final userData = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(user!.uid)
-        .get();
-    setState(() {
-      favoriteList = userData.data()!['favorite'];
-      isLiked = favoriteList.contains(widget.imageId);
-    });
+  @override
+  initState() {
+    if (!_disposed) {
+      FirebaseFirestore.instance
+          .collection('users')
+          .doc(user!.uid)
+          .get()
+          .then((userData) {
+        setState(() {
+          favoriteList = userData.data()!['favorite'];
+          isLiked = favoriteList.contains(widget.imageId);
+        });
+      });
+      FirebaseFirestore.instance
+          .collection('posts')
+          .doc(widget.imageId)
+          .get()
+          .then((imageData) {
+        setState(() {
+          comments = imageData.data()!['comments'];
+          _numOfFavorite = imageData.data()!['numOfFavorite'];
+        });
+      });
+    }
+    super.initState();
   }
 
-  _getImageMessage() async {
-    final imageData = await FirebaseFirestore.instance.collection('posts')
-        .doc(widget.imageId)
-        .get();
-    setState(() {
-      comments = imageData.data()!['comments'];
-      _numOfFavorite = imageData.data()!['numOfFavorite'];
-    });
+  @override
+  void dispose() {
+    _disposed = true;
+    super.dispose();
   }
 
   getComment() {
@@ -68,48 +80,53 @@ class _FavoriteAndCommentsState extends State<FavoriteAndComments> {
         addFavorite(widget.imageId);
         _numOfFavorite++;
       }
-      FirebaseFirestore.instance.collection("posts").doc(widget.imageId)
-          .update({
-        'numOfFavorite': _numOfFavorite
-      });
+      FirebaseFirestore.instance
+          .collection("posts")
+          .doc(widget.imageId)
+          .update({'numOfFavorite': _numOfFavorite});
       isLiked = !isLiked;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    _getFavoriteList();
-    _getImageMessage();
+    // _getFavoriteList();
+    // _getImageMessage();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Row(
+          mainAxisSize: MainAxisSize.max,
           children: <Widget>[
-            IconButton(
-              onPressed: () {
-                _setFavorite();
-              },
-              icon: Icon(
-                isLiked
-                    ? Icons.favorite
-                    : Icons.favorite_outline,
-                color: Colors.red,
+            Padding(
+              padding: EdgeInsetsDirectional.fromSTEB(8, 8, 0, 8),
+              child: IconButton(
+                onPressed: () {
+                  _setFavorite();
+                },
+                icon: Icon(
+                  isLiked ? Icons.favorite : Icons.favorite_outline,
+                  color: Colors.red,
+                ),
               ),
             ),
-            IconButton(
-                onPressed: () {
-                  getComment();
-                },
-                icon: const Icon(Icons.mode_comment_outlined))
+            Padding(
+              padding: EdgeInsetsDirectional.fromSTEB(8, 8, 0, 8),
+              child: IconButton(
+                  onPressed: () {
+                    getComment();
+                  },
+                  icon: const Icon(Icons.mode_comment_outlined)),
+            ),
           ],
         ),
-        if (_numOfFavorite > 0) Text(
-          _numOfFavorite.toString() + "likes",
-          textAlign: TextAlign.left,
-        ),
+        if (_numOfFavorite > 0)
+          Text(
+            _numOfFavorite.toString() + "likes",
+            textAlign: TextAlign.left,
+          ),
       ],
     );
   }
 }
-

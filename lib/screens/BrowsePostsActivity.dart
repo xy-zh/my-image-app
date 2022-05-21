@@ -12,7 +12,6 @@ class BrowsePostsActivity extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return FutureBuilder(
         future: Firebase.initializeApp(),
         builder: (context, appSnapshot) {
@@ -29,72 +28,82 @@ class BrowsePostsActivity extends StatelessWidget {
                 }
                 return Scaffold(
                   appBar: AppBar(
-                    title: const Text('My Image, My Life'),
-                    actions: [
-                      DropdownButton(
-                        underline: Container(),
-                        icon: Icon(
-                          Icons.more_vert,
-                          color: Theme.of(context).primaryIconTheme.color,
+                    title: const Text(
+                      'My Image, My Life',
+                      style: TextStyle(
+                      fontFamily: 'Poppins',
+                      color: Colors.white,
+                      fontSize: 22,
+                    ),
+                  ),
+                  actions: [
+                    DropdownButton(
+                      underline: Container(),
+                      icon: Icon(
+                        Icons.more_vert,
+                        color: Theme
+                            .of(context)
+                            .primaryIconTheme
+                            .color,
+                      ),
+                      items: [
+                        DropdownMenuItem(
+                          child: Row(
+                            children: const <Widget>[
+                              Icon(Icons.exit_to_app),
+                              SizedBox(width: 8),
+                              Text('Logout'),
+                            ],
+                          ),
+                          value: 'logout',
                         ),
-                        items: [
-                          DropdownMenuItem(
-                            child: Row(
-                              children: const <Widget>[
-                                Icon(Icons.exit_to_app),
-                                SizedBox(width: 8),
-                                Text('Logout'),
-                              ],
-                            ),
-                            value: 'logout',
+                        DropdownMenuItem(
+                          child: Row(
+                            children: const <Widget>[
+                              Icon(Icons.add),
+                              SizedBox(width: 8),
+                              Text('Add a new post'),
+                            ],
                           ),
-                          DropdownMenuItem(
-                            child: Row(
-                              children: const <Widget>[
-                                Icon(Icons.add),
-                                SizedBox(width: 8),
-                                Text('Add a new post'),
-                              ],
-                            ),
-                            value: 'add',
-                          ),
-                        ],
-                        onChanged: (itemIdentifier) {
-                          if (itemIdentifier == 'logout') {
-                            FirebaseAuth.instance.signOut();
-                          }
-                          if (itemIdentifier == 'add') {
-                            Navigator.pushNamed(context, '/newPost');
-                          }
-                        },
-                      ),
-                    ],
-                  ),
-                  body: ListView(
-                    scrollDirection: Axis.vertical,
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    children: const <Widget>[
-                      Divider(
-                        height: 8,
-                        thickness: 1,
-                        indent: 8,
-                        endIndent: 8,
-                        color: Colors.grey,
-                      ),
-                      SizedBox(
-                        height: 1200,
-                        child: Posts(),
-                      ),
+                          value: 'add',
+                        ),
+                      ],
+                      onChanged: (itemIdentifier) {
+                        if (itemIdentifier == 'logout') {
+                          FirebaseAuth.instance.signOut();
+                        }
+                        if (itemIdentifier == 'add') {
+                          Navigator.pushNamed(context, '/newPost');
+                        }
+                      },
+                    ),
+                  ],
+                ),
+                body: ListView(
+                scrollDirection: Axis.vertical,
+                physics: const AlwaysScrollableScrollPhysics(),
+                children: const <Widget>[
+                Divider(
+                height: 8,
+                thickness: 1,
+                indent: 8,
+                endIndent: 8,
+                color: Colors.grey,
+                ),
+                SizedBox(
+                height: 1200,
+                child: Posts(),
+                ),
 
-                    ],
-                  ),
-                  floatingActionButton: FloatingActionButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/newPost');
-                    },
-                    tooltip: 'Add Item to post',
-                    child: const Icon(Icons.add),
-                  ),
+                ],
+                ),
+                floatingActionButton: FloatingActionButton(
+                onPressed: () {
+                Navigator.pushNamed(context, '/newPost');
+                },
+                tooltip: 'Add Item to post',
+                child: const Icon(Icons.add),
+                ),
                 );
               });
         });
